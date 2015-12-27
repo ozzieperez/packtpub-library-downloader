@@ -1,6 +1,8 @@
 # PacktPub eBooks Downloader
 
-This script simply automates downloading all your eBooks. 
+Automatically download all your eBooks. You know you have a jillion.
+
+See: [PacktPub Free Daily Book](https://www.packtpub.com/packt/offers/free-learning)
 
 
 ## How to run it:
