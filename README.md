@@ -10,14 +10,14 @@ It'll create a directory in the same path you run the script from named "packt_d
 
 Tested working on Python 2.7.11
 
-## Requirements:
+## Dependencies:
 
 
-* Requests:
+* [Requests](http://docs.python-requests.org/en/latest/):
 
 		pip install requests
 	
-* lxml:
+* [lxml](http://lxml.de/):
 
 		pip install lxml
 	
