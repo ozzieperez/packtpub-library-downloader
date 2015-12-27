@@ -1,5 +1,5 @@
-import requests
 import os
+import requests
 from lxml import html
 
 # saves downloaded asset to a directory
@@ -64,7 +64,7 @@ with requests.Session() as c:
 				print title
 				print '#################################################################'
 				
-				# get the links
+				# get the download links
 				pdf = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/pdf')]/@href")
 				epub = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/epub')]/@href")
 				mobi = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/mobi')]/@href")

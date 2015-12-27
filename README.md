@@ -1,6 +1,6 @@
 # PacktPub eBooks Downloader
 
-Automatically download all your eBooks. You know you have a jillion.
+Automatically download all your eBooks. 
 
 See: [PacktPub Free Daily Book](https://www.packtpub.com/packt/offers/free-learning)
 
