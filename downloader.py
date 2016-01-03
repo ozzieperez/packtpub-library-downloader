@@ -18,8 +18,8 @@ def download_to_file(directory, url):
 def main(argv):
    	email = ''
    	password = ''
-   	directory = ''
-   	formats = ''
+   	directory = 'packt_ebooks'
+   	formats = 'pdf,mobi,epub'
    	includeCode = False
 
    	# get the command line arguments/options
@@ -36,7 +36,7 @@ def main(argv):
 		elif opt in ('-p','--pass'):
 	 		password = arg
 		elif opt in ('-d','--download_directory'):
-			directory = arg
+			directory = os.path.expanduser(arg) if '~' in arg else os.path.abspath(arg)
 		elif opt in ('-f','--formats'):
 			formats = arg
 		elif opt in ('-c','--include-code'):
@@ -84,50 +84,52 @@ def main(argv):
 
 		print "Found %s books" % len(book_nodes)
 
-		#loop through the books
+		# loop through the books
 		for book in book_nodes:
+
+			# scrub the title
+			title = book.xpath("@title")[0].replace("/","-").replace(" [eBook]","")
+
+			# path to save the file
+			path = os.path.join(directory,title)
 			
-				#strip junk from the title
-				title = book.xpath("@title")[0].replace("/","-").replace(" [eBook]","")
-				directory = "packt_downloads/" + title
-				
-				# create the folder if doesn't exist
-				if not os.path.exists(directory):
-					os.makedirs(directory)
+			# create the folder if doesn't exist
+			if not os.path.exists(path):
+				os.makedirs(path)
 
-				print '#################################################################'
-				print title
-				print '#################################################################'
-				
-				# get the download links
-				pdf = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/pdf')]/@href")
-				epub = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/epub')]/@href")
-				mobi = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/mobi')]/@href")
-				code = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/code_download')]/@href")
-				
-				#pdf
-				if len(pdf) > 0 and 'pdf' in formats:
-					filename = directory + "/" + title + ".pdf"
-					print "Downloading PDF:", pdf[0]
-					download_to_file(filename, pdf[0])
+			print '#################################################################'
+			print title
+			print '#################################################################'
+			
+			# get the download links
+			pdf = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/pdf')]/@href")
+			epub = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/epub')]/@href")
+			mobi = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/mobi')]/@href")
+			code = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/code_download')]/@href")
+			
+			# pdf
+			if len(pdf) > 0 and 'pdf' in formats:
+				filename = path + "/" + title + ".pdf"
+				print "Downloading PDF:", pdf[0]
+				download_to_file(filename, pdf[0])
 
-				#epub
-				if len(epub) > 0 and 'epub' in formats:
-					filename = directory + "/" + title + ".epub"
-					print "Downloading EPUB:", epub[0]
-					download_to_file(filename, epub[0])
+			# epub
+			if len(epub) > 0 and 'epub' in formats:
+				filename = path + "/" + title + ".epub"
+				print "Downloading EPUB:", epub[0]
+				download_to_file(filename, epub[0])
 
-				#mobi
-				if len(mobi) > 0 and 'mobi' in formats:
-					filename = directory + "/" + title + ".mobi"
-					print "Downloading MOBI:", mobi[0]
-					download_to_file(filename, mobi[0])
+			# mobi
+			if len(mobi) > 0 and 'mobi' in formats:
+				filename = path + "/" + title + ".mobi"
+				print "Downloading MOBI:", mobi[0]
+				download_to_file(filename, mobi[0])
 
-				#code
-				if len(code) > 0 and includeCode:
-					filename = directory + "/" + title + " [CODE].zip"
-					print "Downloading CODE:", code[0]
-					download_to_file(filename, code[0])
+			# code
+			if len(code) > 0 and includeCode:
+				filename = path + "/" + title + " [CODE].zip"
+				print "Downloading CODE:", code[0]
+				download_to_file(filename, code[0])
 
 
 if __name__ == "__main__":
