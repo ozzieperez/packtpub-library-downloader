@@ -7,6 +7,9 @@ Automatically download all your eBooks.
 ## How to use it:
 	python downloader.py -e <email> -p <password> [-f <formats> -d <directory> --include-code]
 
+##### Example: Download only PDFs and any source code to my Desktop
+	python downloader.py -e 'hello@world.com' -p 'p@ssw0rd' -f 'pdf' -d '~/Desktop' -c
+
 ### Options
 *-e*, *--email* = Your login email	
 *-p*, *--password* = Your login password	

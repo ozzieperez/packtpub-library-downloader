@@ -49,8 +49,9 @@ def main(argv):
 	# create a session
 	session = requests.Session()
 
-	# initial request to get the "csrf token" for the login
 	print "Attempting to login..."
+	
+	# initial request to get the "csrf token" for the login
 	url = "https://www.packtpub.com/"
 	start_req = session.get(url)
 
