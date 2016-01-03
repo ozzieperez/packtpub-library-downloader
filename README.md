@@ -17,8 +17,6 @@ Automatically download all your eBooks.
 *-d*, *--directory* = Directory to download into. Default is "packt_ebooks/" in the current directory		
 *-c*, *--include-code* = Flag to include code files, if any	
 
-Tested working on Python 2.7.11
-
 ## Dependencies:
 
 
@@ -30,3 +28,4 @@ Tested working on Python 2.7.11
 
 		pip install lxml
 	
+Tested working on Python 2.7.11
