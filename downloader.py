@@ -5,15 +5,16 @@ import requests
 import sys, getopt
 from lxml import html
 
+# create session
 session = requests.Session()
 
 # saves downloaded asset to a directory
 def download_to_file(directory, url):
 	if not os.path.exists(directory):
-			resource = session.get("https://www.packtpub.com" + url)
-			target = open(directory, 'w')
-			target.write(resource.content)
-			target.close()
+		resource = session.get("https://www.packtpub.com" + url)
+		target = open(directory, 'w')
+		target.write(resource.content)
+		target.close()
 
 def main(argv):
    	email = ''
