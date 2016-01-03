@@ -19,12 +19,13 @@ def main(argv):
    	directory = 'packt_ebooks'
    	formats = 'pdf,mobi,epub'
    	includeCode = False
+   	errorMessage = 'Usage: downloader.py -e <email> -p <password> [-f <formats> -d <directory> --include-code]'
 
    	# get the command line arguments/options
 	try:	
-  		opts, args = getopt.getopt(argv,"ce:p:d:f:",["email=","pass=","download-directory=","formats=","include-code"])
+  		opts, args = getopt.getopt(argv,"ce:p:d:f:",["email=","pass=","directory=","formats=","include-code"])
 	except getopt.GetoptError:
-  		print 'downloader.py -e <email> -p <password> [-d <download_directory>]'
+  		print errorMessage
   		sys.exit(2)
 
   	# hold the values of the command line options
@@ -33,7 +34,7 @@ def main(argv):
 	 		email = arg
 		elif opt in ('-p','--pass'):
 	 		password = arg
-		elif opt in ('-d','--download_directory'):
+		elif opt in ('-d','--directory'):
 			directory = os.path.expanduser(arg) if '~' in arg else os.path.abspath(arg)
 		elif opt in ('-f','--formats'):
 			formats = arg
@@ -42,7 +43,7 @@ def main(argv):
 
 	# do we have the minimum required info
 	if not email or not password:
-		print "Usage: downloader.py -e <email> -p <password> [-d <download_directory>]"
+		print errorMessage
 		sys.exit(2)
 
 	# create a session
