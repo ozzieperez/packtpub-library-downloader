@@ -5,11 +5,8 @@ import requests
 import sys, getopt
 from lxml import html
 
-# create session
-session = requests.Session()
-
 # saves downloaded asset to a directory
-def download_to_file(directory, url):
+def download_to_file(directory, url, session):
 	if not os.path.exists(directory):
 		resource = session.get("https://www.packtpub.com" + url)
 		target = open(directory, 'w')
@@ -47,6 +44,9 @@ def main(argv):
 	if not email or not password:
 		print "Usage: downloader.py -e <email> -p <password> [-d <download_directory>]"
 		sys.exit(2)
+
+	# create a session
+	session = requests.Session()
 
 	# initial request to get the "csrf token" for the login
 	print "Attempting to login..."
@@ -112,25 +112,25 @@ def main(argv):
 			if len(pdf) > 0 and 'pdf' in formats:
 				filename = path + "/" + title + ".pdf"
 				print "Downloading PDF:", pdf[0]
-				download_to_file(filename, pdf[0])
+				download_to_file(filename, pdf[0], session)
 
 			# epub
 			if len(epub) > 0 and 'epub' in formats:
 				filename = path + "/" + title + ".epub"
 				print "Downloading EPUB:", epub[0]
-				download_to_file(filename, epub[0])
+				download_to_file(filename, epub[0], session)
 
 			# mobi
 			if len(mobi) > 0 and 'mobi' in formats:
 				filename = path + "/" + title + ".mobi"
 				print "Downloading MOBI:", mobi[0]
-				download_to_file(filename, mobi[0])
+				download_to_file(filename, mobi[0], session)
 
 			# code
 			if len(code) > 0 and includeCode:
 				filename = path + "/" + title + " [CODE].zip"
 				print "Downloading CODE:", code[0]
-				download_to_file(filename, code[0])
+				download_to_file(filename, code[0], session)
 
 
 if __name__ == "__main__":
