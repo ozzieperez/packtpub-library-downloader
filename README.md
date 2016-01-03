@@ -1,7 +1,6 @@
 # PacktPub Library Downloader
 
-Automatically download all your eBooks. 	
-(See: [PacktPub Free Daily Book](https://www.packtpub.com/packt/offers/free-learning))
+Automatically download all your eBooks. (See: [PacktPub Free Daily Book](https://www.packtpub.com/packt/offers/free-learning))
 
 
 ## How to use it:
@@ -27,5 +26,5 @@ Automatically download all your eBooks.
 * [lxml](http://lxml.de/) for HTML parsing:
 
 		pip install lxml
-	
+
 Tested working on Python 2.7.11
