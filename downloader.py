@@ -6,14 +6,17 @@ import sys, getopt
 from lxml import html
 
 # saves downloaded asset to a directory
-def download_to_file(directory, url, session):
+def download_to_file(directory, url, session, headers):
 	if not os.path.exists(directory):
-		resource = session.get("https://www.packtpub.com" + url)
+		resource = session.get("https://www.packtpub.com" + url, verify=True, headers=headers)
 		target = open(directory, 'w')
 		target.write(resource.content)
 		target.close()
 
 def main(argv):
+	headers = {
+		"User-Agent": "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 " +
+		"(KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"}
    	email = ''
    	password = ''
    	directory = 'packt_ebooks'
@@ -53,7 +56,7 @@ def main(argv):
 	
 	# initial request to get the "csrf token" for the login
 	url = "https://www.packtpub.com/"
-	start_req = session.get(url)
+	start_req = session.get(url, verify=True, headers=headers)
 
 	# extract the "csrf token" (form_build_id) to submit with login POST
 	tree = html.fromstring(start_req.content)
@@ -68,10 +71,10 @@ def main(argv):
 			form_build_id=form_build_id)
 
 	# login
-	session.post(url, data=login_data)
+	session.post(url, data=login_data, verify=True, headers=headers)
 
 	# get the ebooks page
-	books_page = session.get("https://www.packtpub.com/account/my-ebooks")
+	books_page = session.get("https://www.packtpub.com/account/my-ebooks", verify=True, headers=headers)
 	books_tree = html.fromstring(books_page.content)
 
 	# login successful?
@@ -114,25 +117,25 @@ def main(argv):
 			if len(pdf) > 0 and 'pdf' in formats:
 				filename = path + "/" + title + ".pdf"
 				print "Downloading PDF:", pdf[0]
-				download_to_file(filename, pdf[0], session)
+				download_to_file(filename, pdf[0], session, headers)
 
 			# epub
 			if len(epub) > 0 and 'epub' in formats:
 				filename = path + "/" + title + ".epub"
 				print "Downloading EPUB:", epub[0]
-				download_to_file(filename, epub[0], session)
+				download_to_file(filename, epub[0], session, headers)
 
 			# mobi
 			if len(mobi) > 0 and 'mobi' in formats:
 				filename = path + "/" + title + ".mobi"
 				print "Downloading MOBI:", mobi[0]
-				download_to_file(filename, mobi[0], session)
+				download_to_file(filename, mobi[0], session, headers)
 
 			# code
 			if len(code) > 0 and includeCode:
 				filename = path + "/" + title + " [CODE].zip"
 				print "Downloading CODE:", code[0]
-				download_to_file(filename, code[0], session)
+				download_to_file(filename, code[0], session, headers)
 
 
 if __name__ == "__main__":
