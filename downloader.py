@@ -98,10 +98,10 @@ def main(argv):
 			# scrub the title
 			# sometimes ends with space but the created directory does not contain, therefore the strip call
 			title = book.xpath("@title")[0].replace("/","-").replace(" [eBook]","").strip()
+			# title fix: colon is not valid in path (at least on windows) but the title sometimes contain it
+			title = title.replace(":", " -")
 			# path to save the file
 			path = os.path.join(directory,title)
-			# path fix: colon is not valid in path (at least on windows) but the title sometimes contain it
-			path = path.replace(":", " -")
 			# create the folder if doesn't exist
 			if not os.path.exists(path):
 				os.makedirs(path)
