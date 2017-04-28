@@ -8,9 +8,11 @@ from lxml import html
 # saves downloaded asset to a directory
 def download_to_file(directory, url, session, headers):
 	if not os.path.exists(directory):
-		resource = session.get("https://www.packtpub.com" + url, verify=True, headers=headers)
-		target = open(directory, 'w')
-		target.write(resource.content)
+		# save content in chunks: sometimes got memoryerror
+		resource = session.get("https://www.packtpub.com" + url, verify=True, stream=True, headers=headers)
+		target = open(directory, 'wb')
+		for chunk in resource.iter_content(chunk_size=1024):
+			target.write(chunk)
 		target.close()
 
 def main(argv):
@@ -94,48 +96,50 @@ def main(argv):
 		for book in book_nodes:
 
 			# scrub the title
-			title = book.xpath("@title")[0].replace("/","-").replace(" [eBook]","")
-
+			# sometimes ends with space but the created directory does not contain, therefore the strip call
+			title = book.xpath("@title")[0].replace("/","-").replace(" [eBook]","").strip()
+			# title fix: colon is not valid in path (at least on windows) but the title sometimes contain it
+			title = title.replace(":", " -")
 			# path to save the file
 			path = os.path.join(directory,title)
-			
 			# create the folder if doesn't exist
 			if not os.path.exists(path):
 				os.makedirs(path)
+				# in this way (the download happens only when the target path does not exist) the whole downloading is continuable
+				# the title sometimes contains some weird characters that python could not print
+				print '#################################################################'
+				print title.encode(sys.stdout.encoding, errors='replace')
+				print '#################################################################'
+				
+				# get the download links
+				pdf = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/pdf')]/@href")
+				epub = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/epub')]/@href")
+				mobi = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/mobi')]/@href")
+				code = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/code_download')]/@href")
+				
+				# pdf
+				if len(pdf) > 0 and 'pdf' in formats:
+					filename = os.path.join(path, title + ".pdf")
+					print "Downloading PDF:", pdf[0]
+					download_to_file(filename, pdf[0], session, headers)
 
-			print '#################################################################'
-			print title
-			print '#################################################################'
-			
-			# get the download links
-			pdf = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/pdf')]/@href")
-			epub = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/epub')]/@href")
-			mobi = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/mobi')]/@href")
-			code = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/code_download')]/@href")
-			
-			# pdf
-			if len(pdf) > 0 and 'pdf' in formats:
-				filename = path + "/" + title + ".pdf"
-				print "Downloading PDF:", pdf[0]
-				download_to_file(filename, pdf[0], session, headers)
+				# epub
+				if len(epub) > 0 and 'epub' in formats:
+					filename = os.path.join(path, title + ".epub")
+					print "Downloading EPUB:", epub[0]
+					download_to_file(filename, epub[0], session, headers)
 
-			# epub
-			if len(epub) > 0 and 'epub' in formats:
-				filename = path + "/" + title + ".epub"
-				print "Downloading EPUB:", epub[0]
-				download_to_file(filename, epub[0], session, headers)
+				# mobi
+				if len(mobi) > 0 and 'mobi' in formats:
+					filename = os.path.join(path, title + ".mobi")
+					print "Downloading MOBI:", mobi[0]
+					download_to_file(filename, mobi[0], session, headers)
 
-			# mobi
-			if len(mobi) > 0 and 'mobi' in formats:
-				filename = path + "/" + title + ".mobi"
-				print "Downloading MOBI:", mobi[0]
-				download_to_file(filename, mobi[0], session, headers)
-
-			# code
-			if len(code) > 0 and includeCode:
-				filename = path + "/" + title + " [CODE].zip"
-				print "Downloading CODE:", code[0]
-				download_to_file(filename, code[0], session, headers)
+				# code
+				if len(code) > 0 and includeCode:
+					filename = os.path.join(path, title + " [CODE].zip")
+					print "Downloading CODE:", code[0]
+					download_to_file(filename, code[0], session, headers)
 
 
 if __name__ == "__main__":
