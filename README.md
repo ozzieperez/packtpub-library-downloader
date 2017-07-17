@@ -7,7 +7,7 @@ Automatically download all your eBooks. (See: [PacktPub Free Daily Book](https:/
 	python downloader.py -e <email> -p <password> [-f <formats> -d <directory> --include-code]
 
 ##### Example: Download PDFs, EPUBs, and source code to my Desktop
-	python downloader.py -e _hello@world.com_ -p _p@ssw0rd_ -f _pdf,epub_ -d _~/Desktop_ -c
+	python downloader.py -e hello@world.com -p p@ssw0rd -f pdf,epub -d ~/Desktop -c
 
 ### Options
 - *-e*, *--email* = Your login email
