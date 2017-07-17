@@ -19,18 +19,18 @@ def main(argv):
 	headers = {
 		"User-Agent": "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 " +
 		"(KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"}
-   	email = ''
-   	password = ''
-   	directory = 'packt_ebooks'
-   	formats = 'pdf,mobi,epub'
-   	includeCode = False
-   	errorMessage = 'Usage: downloader.py -e <email> -p <password> [-f <formats> -d <directory> --include-code]'
+	email = ''
+	password = ''
+	directory = 'packt_ebooks'
+	formats = 'pdf,mobi,epub'
+	includeCode = False
+	errorMessage = 'Usage: downloader.py -e <email> -p <password> [-f <formats> -d <directory> --include-code]'
 
    	# get the command line arguments/options
 	try:	
   		opts, args = getopt.getopt(argv,"ce:p:d:f:",["email=","pass=","directory=","formats=","include-code"])
 	except getopt.GetoptError:
-  		print errorMessage
+  		print(errorMessage)
   		sys.exit(2)
 
   	# hold the values of the command line options
@@ -48,13 +48,13 @@ def main(argv):
 
 	# do we have the minimum required info
 	if not email or not password:
-		print errorMessage
+		print(errorMessage)
 		sys.exit(2)
 
 	# create a session
 	session = requests.Session()
 
-	print "Attempting to login..."
+	print("Attempting to login...")
 	
 	# initial request to get the "csrf token" for the login
 	url = "https://www.packtpub.com/"
@@ -81,16 +81,16 @@ def main(argv):
 
 	# login successful?
 	if "Register" in books_tree.xpath("//title/text()")[0]:
-		print "Invalid login."
+		print("Invalid login.")
 	
 	# we're in, start downloading
 	else:
-		print "Logged in successfully!"
+		print("Logged in successfully!")
 
 		# any books?
 		book_nodes = books_tree.xpath("//div[@id='product-account-list']/div[contains(@class,'product-line unseen')]")
 
-		print "Found %s books" % len(book_nodes)
+		print("Found %s books" % len(book_nodes))
 
 		# loop through the books
 		for book in book_nodes:
@@ -107,9 +107,9 @@ def main(argv):
 				os.makedirs(path)
 				# in this way (the download happens only when the target path does not exist) the whole downloading is continuable
 				# the title sometimes contains some weird characters that python could not print
-				print '#################################################################'
-				print title.encode(sys.stdout.encoding, errors='replace')
-				print '#################################################################'
+				print('#################################################################')
+				print(title.encode(sys.stdout.encoding, errors='replace'))
+				print('#################################################################')
 				
 				# get the download links
 				pdf = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/pdf')]/@href")
@@ -120,25 +120,25 @@ def main(argv):
 				# pdf
 				if len(pdf) > 0 and 'pdf' in formats:
 					filename = os.path.join(path, title + ".pdf")
-					print "Downloading PDF:", pdf[0]
+					print("Downloading PDF:", pdf[0])
 					download_to_file(filename, pdf[0], session, headers)
 
 				# epub
 				if len(epub) > 0 and 'epub' in formats:
 					filename = os.path.join(path, title + ".epub")
-					print "Downloading EPUB:", epub[0]
+					print("Downloading EPUB:", epub[0])
 					download_to_file(filename, epub[0], session, headers)
 
 				# mobi
 				if len(mobi) > 0 and 'mobi' in formats:
 					filename = os.path.join(path, title + ".mobi")
-					print "Downloading MOBI:", mobi[0]
+					print("Downloading MOBI:", mobi[0])
 					download_to_file(filename, mobi[0], session, headers)
 
 				# code
 				if len(code) > 0 and includeCode:
 					filename = os.path.join(path, title + " [CODE].zip")
-					print "Downloading CODE:", code[0]
+					print("Downloading CODE:", code[0])
 					download_to_file(filename, code[0], session, headers)
 
 
