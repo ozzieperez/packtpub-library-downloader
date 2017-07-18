@@ -147,8 +147,9 @@ def main(argv):
                                 # Cover-image
                                 if len(image) > 0 and 'jpg' in formats:
                                         filename = os.path.join(path, title + " [Cover].jpg")
-                                        print("Downloading IMAGE:", "https:" + image[0])
-                                        download_to_file(filename, "https:" + image[0], session, headers, False)
+                                        image_url = "https:" + image[0].replace("/imagecache/thumbview", "", 1)
+                                        print("Downloading IMAGE:", image_url)
+                                        download_to_file(filename, image_url, session, headers, False)
 
 
 
