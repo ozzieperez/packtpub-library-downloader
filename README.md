@@ -12,8 +12,8 @@ Automatically download all your eBooks. (See: [PacktPub Free Daily Book](https:/
 ### Options
 - *-e*, *--email* = Your login email
 - *-p*, *--password* = Your login password
-- *-f*, *--formats* = File formats to download. Default is "pdf,mobi,epub"
-- *-d*, *--directory* = Directory to download into. Default is "packt_ebooks/" in the current directory
+- *-f*, *--formats* = File formats to download. Default is "pdf,mobi,epub,jpg"
+- *-d*, *--directory* = Directory to download into. Default is "packtpub_media/" in the current directory
 - *-c*, *--include-code* = Flag to include code files, if any
 
 ## Dependencies:
