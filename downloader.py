@@ -7,14 +7,21 @@ from lxml import html
 
 # saves downloaded asset to a directory
 def download_to_file(directory, url, session, headers, prefix_url=True):
-		if not os.path.exists(directory):
-				# save content in chunks: sometimes got memoryerror
-				if prefix_url:
-					url = "https://www.packtpub.com" + url
-				resource = session.get(url, verify=True, stream=True, headers=headers)
+	if not os.path.exists(directory):
+
+		if prefix_url:
+			url = "https://www.packtpub.com" + url
+
+		resource = session.get(url, verify=True, stream=True, headers=headers)
+
+		# open the directory to write to
 		target = open(directory, 'wb')
+
+		# save content in chunks: sometimes got memoryerror
 		for chunk in resource.iter_content(chunk_size=1024):
 			target.write(chunk)
+		
+		# dispose handle to the directory
 		target.close()
 
 def main(argv):
