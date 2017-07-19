@@ -32,7 +32,6 @@ def main(argv):
 	password = ''
 	directory = 'packtpub_media'
 	fileTypes = 'pdf,mobi,epub,jpg,code'
-	includeCode = False
 	errorMessage = 'Usage: downloader.py -e <email> -p <password> [-f <filetypes> -d <directory>]'
 
 	# get the command line arguments/options
@@ -52,6 +51,18 @@ def main(argv):
 			directory = os.path.expanduser(arg) if '~' in arg else os.path.abspath(arg)
 		elif opt in ('-f','--files'):
 			fileTypes = arg
+	# check for books or video usage
+	includeBooks=False
+	includeVideos=False
+
+	if 'pdf' in fileTypes:
+		includeBooks=True
+	elif 'epub' in fileTypes:
+		includeBooks=True
+	elif 'mobi' in fileTypes:
+		includeBooks=True
+	elif 'video' in fileTypes:
+		includeVideos=True
 
 	# do we have the minimum required info
 	if not email or not password:
@@ -85,7 +96,8 @@ def main(argv):
 	# get the ebooks page
 	books_page = session.get("https://www.packtpub.com/account/my-ebooks", verify=True, headers=headers)
 	books_tree = html.fromstring(books_page.content)
-
+	videos_page = session.get("https://www.packtpub.com/account/my-videos", verify=True, headers=headers)
+	videos_tree = html.fromstring(videos_page.content)
 	# login successful?
 	if "Register" in books_tree.xpath("//title/text()")[0]:
 		print("Invalid login.")
@@ -94,67 +106,113 @@ def main(argv):
 	else:
 		print("Logged in successfully!")
 
-		# any books?
+		# any books / videos ?
 		book_nodes = books_tree.xpath("//div[@id='product-account-list']/div[contains(@class,'product-line unseen')]")
+		video_nodes = videos_tree.xpath("//div[@id='product-account-list']/div[contains(@class,'product-line unseen')]")
 
-		print("Found %s books" % len(book_nodes))
+		print("Found %s books and %s videos in your library" % (len(book_nodes),len(video_nodes)))
 
 		# loop through the books
-		for book in book_nodes:
+		if includeBooks:
+			for book in book_nodes:
 
-			# scrub the title
-			# sometimes ends with space but the created directory does not contain, therefore the strip call
-			title = book.xpath("@title")[0].replace("/","-").replace(" [eBook]","").strip()
-			# title fix: colon is not valid in path (at least on windows) but the title sometimes contain it
-			title = title.replace(":", " -")
-			# path to save the file
-			path = os.path.join(directory,title)
-			# create the folder if doesn't exist
-			if not os.path.exists(path):
-				os.makedirs(path)
-				# in this way (the download happens only when the target path does not exist) the whole downloading is continuable
-				# the title sometimes contains some weird characters that python could not print
-				print('#################################################################')
-				print(title.encode(sys.stdout.encoding, errors='replace').decode())
-				print('#################################################################')
+				# scrub the title
+				# sometimes ends with space but the created directory does not contain, therefore the strip call
+				title = book.xpath("@title")[0].replace("/","-").replace(" [eBook]","").strip()
+				# title fix: colon is not valid in path (at least on windows) but the title sometimes contain it
+				title = title.replace(":", " -")
+				# path to save the file
+				path = os.path.join(directory,title)
+				# create the folder if doesn't exist
+				if not os.path.exists(path):
+					os.makedirs(path)
+					# in this way (the download happens only when the target path does not exist) the whole downloading is continuable
+					# the title sometimes contains some weird characters that python could not print
+					print('#################################################################')
+					print(title.encode(sys.stdout.encoding, errors='replace'))
+					print('#################################################################')
 
-				# get the download links
-				pdf = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/pdf')]/@href")
-				epub = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/epub')]/@href")
-				mobi = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/mobi')]/@href")
-				code = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/code_download')]/@href")
-				image = book.xpath(".//div[contains(@class,'product-thumbnail')]//img/@src")
+					# get the download links
+					pdf = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/pdf')]/@href")
+					epub = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/epub')]/@href")
+					mobi = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/mobi')]/@href")
+					code = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/code_download')]/@href")
+					image = book.xpath(".//div[contains(@class,'product-thumbnail')]//img/@src")
 
-				# pdf
-				if len(pdf) > 0 and 'pdf' in fileTypes:
-					filename = os.path.join(path, title + ".pdf")
-					print("Downloading PDF:", pdf[0])
-					download_to_file(filename, pdf[0], session, headers)
+					# pdf
+					if len(pdf) > 0 and 'pdf' in fileTypes:
+						filename = os.path.join(path, title + ".pdf")
+						print("Downloading PDF:", pdf[0])
+						download_to_file(filename, pdf[0], session, headers)
 
-				# epub
-				if len(epub) > 0 and 'epub' in fileTypes:
-					filename = os.path.join(path, title + ".epub")
-					print("Downloading EPUB:", epub[0])
-					download_to_file(filename, epub[0], session, headers)
+					# epub
+					if len(epub) > 0 and 'epub' in fileTypes:
+						filename = os.path.join(path, title + ".epub")
+						print("Downloading EPUB:", epub[0])
+						download_to_file(filename, epub[0], session, headers)
 
-				# mobi
-				if len(mobi) > 0 and 'mobi' in fileTypes:
-					filename = os.path.join(path, title + ".mobi")
-					print("Downloading MOBI:", mobi[0])
-					download_to_file(filename, mobi[0], session, headers)
+					# mobi
+					if len(mobi) > 0 and 'mobi' in fileTypes:
+						filename = os.path.join(path, title + ".mobi")
+						print("Downloading MOBI:", mobi[0])
+						download_to_file(filename, mobi[0], session, headers)
 
-				# code
-				if len(code) > 0 and 'code' in fileTypes:
-					filename = os.path.join(path, title + " [CODE].zip")
-					print("Downloading CODE:", code[0])
-					download_to_file(filename, code[0], session, headers)
+					# code
+					if len(code) > 0 and 'code' in fileTypes:
+						filename = os.path.join(path, title + " [CODE].zip")
+						print("Downloading CODE:", code[0])
+						download_to_file(filename, code[0], session, headers)
 
-				# Cover-image
-				if len(image) > 0 and 'jpg' in fileTypes:
-					filename = os.path.join(path, title + " [Cover].jpg")
-					image_url = "https:" + image[0].replace("/imagecache/thumbview", "", 1)
-					print("Downloading IMAGE:", image_url)
-					download_to_file(filename, image_url, session, headers, False)
+					# Cover-image
+					if len(image) > 0 and 'jpg' in fileTypes:
+						filename = os.path.join(path, title + " [Cover].jpg")
+						image_url = "https:" + image[0].replace("/imagecache/thumbview", "", 1)
+						print("Downloading IMAGE:", image_url)
+						download_to_file(filename, image_url, session, headers, False)
+
+		# loop through the Videos
+		if includeVideos:
+			for video in video_nodes:
+
+				# scrub the title
+				# sometimes ends with space but the created directory does not contain, therefore the strip call
+				title = video.xpath("@title")[0].replace("/","-").replace(" [Video]","").strip()
+				# title fix: colon is not valid in path (at least on windows) but the title sometimes contain it
+				title = title.replace(":", " -")
+				# path to save the file
+				path = os.path.join(directory,title)
+				# create the folder if doesn't exist
+				if not os.path.exists(path):
+					os.makedirs(path)
+					# in this way (the download happens only when the target path does not exist) the whole downloading is continuable
+					# the title sometimes contains some weird characters that python could not print
+					print('#################################################################')
+					print(title.encode(sys.stdout.encoding, errors='replace'))
+					print('#################################################################')
+
+					# get the download links
+					code = video.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/code_download')]/@href")
+					image = video.xpath(".//div[contains(@class,'product-thumbnail')]//img/@src")
+					video = video.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/video')]/@href")
+
+					# video
+					if len(video) > 0 and 'video' in fileTypes:
+						filename = os.path.join(path, title + " [VIDEO].zip")
+						print("Downloading Video:", video[0])
+						download_to_file(filename, video[0], session, headers)
+
+					# code
+					if len(code) > 0 and 'code' in fileTypes:
+						filename = os.path.join(path, title + " [CODE].zip")
+						print("Downloading CODE:", code[0])
+						download_to_file(filename, code[0], session, headers)
+
+					# Cover-image
+					if len(image) > 0 and 'jpg' in fileTypes:
+						filename = os.path.join(path, title + " [Cover].jpg")
+						image_url = "https:" + image[0].replace("/imagecache/thumbview", "", 1)
+						print("Downloading IMAGE:", image_url)
+						download_to_file(filename, image_url, session, headers, False)
 
 
 if __name__ == "__main__":
