@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+from __future__ import print_function
 import os
 import requests
 import sys, getopt
@@ -8,7 +9,6 @@ from lxml import html
 # saves downloaded asset to a directory
 def download_to_file(directory, url, session, headers, prefix_url=True):
 	if not os.path.exists(directory):
-
 		if prefix_url:
 			url = "https://www.packtpub.com" + url
 
@@ -117,7 +117,7 @@ def main(argv):
 				# in this way (the download happens only when the target path does not exist) the whole downloading is continuable
 				# the title sometimes contains some weird characters that python could not print
 				print('#################################################################')
-				print(title.encode(sys.stdout.encoding, errors='replace'))
+				print(title.encode(sys.stdout.encoding, errors='replace').decode())
 				print('#################################################################')
 
 				# get the download links
