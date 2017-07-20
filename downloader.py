@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+from __future__ import print_function
 import os
 import requests
 import sys, getopt
@@ -7,14 +8,20 @@ from lxml import html
 
 # saves downloaded asset to a directory
 def download_to_file(directory, url, session, headers, prefix_url=True):
-		if not os.path.exists(directory):
-				# save content in chunks: sometimes got memoryerror
-				if prefix_url:
-					url = "https://www.packtpub.com" + url
-				resource = session.get(url, verify=True, stream=True, headers=headers)
+	if not os.path.exists(directory):
+		if prefix_url:
+			url = "https://www.packtpub.com" + url
+
+		resource = session.get(url, verify=True, stream=True, headers=headers)
+
+		# open the directory to write to
 		target = open(directory, 'wb')
+
+		# save content in chunks: sometimes got memoryerror
 		for chunk in resource.iter_content(chunk_size=1024):
 			target.write(chunk)
+
+		# dispose handle to the directory
 		target.close()
 
 def main(argv):
@@ -125,7 +132,7 @@ def main(argv):
 					# in this way (the download happens only when the target path does not exist) the whole downloading is continuable
 					# the title sometimes contains some weird characters that python could not print
 					print('#################################################################')
-					print(title.encode(sys.stdout.encoding, errors='replace'))
+					print(title.encode(sys.stdout.encoding, errors='replace').decode())
 					print('#################################################################')
 
 					# get the download links
@@ -166,7 +173,7 @@ def main(argv):
 						print("Downloading IMAGE:", image_url)
 						download_to_file(filename, image_url, session, headers, False)
 
-		# loop through the books
+		# loop through the videos
 		if includeVideos:
 			for video in video_nodes:
 
@@ -183,7 +190,7 @@ def main(argv):
 					# in this way (the download happens only when the target path does not exist) the whole downloading is continuable
 					# the title sometimes contains some weird characters that python could not print
 					print('#################################################################')
-					print(title.encode(sys.stdout.encoding, errors='replace'))
+					print(title.encode(sys.stdout.encoding, errors='replace').decode())
 					print('#################################################################')
 
 					# get the download links
@@ -209,7 +216,6 @@ def main(argv):
 						image_url = "https:" + image[0].replace("/imagecache/thumbview", "", 1)
 						print("Downloading IMAGE:", image_url)
 						download_to_file(filename, image_url, session, headers, False)
-
 
 if __name__ == "__main__":
    main(sys.argv[1:])
