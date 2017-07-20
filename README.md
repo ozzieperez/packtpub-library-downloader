@@ -19,6 +19,8 @@ Automatically download all your eBooks and Videos. (See: [PacktPub Free Daily Bo
 - *-f*, *--formats* = File formats to download. Default is "pdf,mobi,epub,jpg". You can select: pdf, mobi, epub, jpg, video
 - *-d*, *--directory* = Directory to download into. Default is "packtpub_media/" in the current directory
 - *-c*, *--include-code* = Flag to include code files, if any
+- *--videosonly* = Only video, jpg and code will be downloaded from the library even when ebook-formats are entered.
+- *--ebooksonly* = Only ebooks, jpg and code will be downloaded from the library even when video-formats are entered.
 
 ## Dependencies:
 

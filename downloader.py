@@ -33,11 +33,13 @@ def main(argv):
 	directory = 'packtpub_media'
 	formats = 'pdf,mobi,epub,jpg'
 	includeCode = False
+	videosOnly = False
+	ebooksOnly = False
 	errorMessage = 'Usage: downloader.py -e <email> -p <password> [-f <formats> -d <directory> --include-code]'
 
 	# get the command line arguments/options
 	try:
-		opts, args = getopt.getopt(argv,"ce:p:d:f:",["email=","pass=","directory=","formats=","include-code"])
+		opts, args = getopt.getopt(argv,"ce:p:d:f:",["email=","pass=","directory=","formats=","include-code","ebooksonly","videosonly"])
 	except getopt.GetoptError:
 		print(errorMessage)
 		sys.exit(2)
@@ -54,6 +56,10 @@ def main(argv):
 			formats = arg
 		elif opt in ('-c','--include-code'):
 			includeCode = True
+		elif opt in ('--videosonly'):
+			videosOnly = True
+		elif opt in ('--ebooksonly'):
+			ebooksOnly = True
 	# check for books or video usage
 	includeBooks=False
 	includeVideos=False
@@ -116,7 +122,7 @@ def main(argv):
 		print("Found %s books and %s videos in your library" % (len(book_nodes),len(video_nodes)))
 
 		# loop through the books
-		if includeBooks:
+		if includeBooks and not videosOnly:
 			for book in book_nodes:
 
 				# scrub the title
@@ -174,7 +180,7 @@ def main(argv):
 						download_to_file(filename, image_url, session, headers, False)
 
 		# loop through the videos
-		if includeVideos:
+		if includeVideos and not ebooksOnly:
 			for video in video_nodes:
 
 				# scrub the title
