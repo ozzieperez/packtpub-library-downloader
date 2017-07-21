@@ -15,6 +15,7 @@ Automatically download all your eBooks. (See: [PacktPub Free Daily Book](https:/
 - *-f*, *--formats* = File formats to download. Default is "pdf,mobi,epub,jpg"
 - *-d*, *--directory* = Directory to download into. Default is "packtpub_media/" in the current directory
 - *-c*, *--include-code* = Flag to include code files, if any
+- *--include-details* = Flag to include book details (unsanitized title, ISBN, Page number and description) in a JSON file
 
 ## Dependencies:
 
@@ -22,7 +23,7 @@ Automatically download all your eBooks. (See: [PacktPub Free Daily Book](https:/
 * [Requests](http://docs.python-requests.org/en/latest/) for HTTP requests:
 
 		pip install requests
-	
+
 * [lxml](http://lxml.de/) for HTML parsing:
 
 		pip install lxml

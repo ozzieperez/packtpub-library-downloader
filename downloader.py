@@ -4,6 +4,7 @@ from __future__ import print_function
 import os
 import requests
 import sys, getopt
+import json
 from lxml import html
 
 reload(sys)
@@ -23,7 +24,7 @@ def download_to_file(directory, url, session, headers, prefix_url=True):
 		# save content in chunks: sometimes got memoryerror
 		for chunk in resource.iter_content(chunk_size=1024):
 			target.write(chunk)
-		
+
 		# dispose handle to the directory
 		target.close()
 
@@ -36,11 +37,12 @@ def main(argv):
 	directory = 'packtpub_media'
 	formats = 'pdf,mobi,epub,jpg'
 	includeCode = False
-	errorMessage = 'Usage: downloader.py -e <email> -p <password> [-f <formats> -d <directory> --include-code]'
+	includeDetails = False
+	errorMessage = 'Usage: downloader.py -e <email> -p <password> [-f <formats> -d <directory> --include-code --include-details]'
 
 	# get the command line arguments/options
 	try:
-		opts, args = getopt.getopt(argv,"ce:p:d:f:",["email=","pass=","directory=","formats=","include-code"])
+		opts, args = getopt.getopt(argv,"ce:p:d:f:",["email=","pass=","directory=","formats=","include-code","include-details"])
 	except getopt.GetoptError:
 		print(errorMessage)
 		sys.exit(2)
@@ -57,6 +59,8 @@ def main(argv):
 			formats = arg
 		elif opt in ('-c','--include-code'):
 			includeCode = True
+		elif opt in ('-i','--include-details'):
+			includeDetails = True
 
 	# do we have the minimum required info
 	if not email or not password:
@@ -107,9 +111,10 @@ def main(argv):
 		# loop through the books
 		for book in book_nodes:
 
+			original_title = book.xpath("@title")[0]
 			# scrub the title
 			# sometimes ends with space but the created directory does not contain, therefore the strip call
-			title = book.xpath("@title")[0].replace("/","-").replace(" [eBook]","").strip()
+			title = original_title.replace("/","-").replace(" [eBook]","").strip()
 			# title fix: colon is not valid in path (at least on windows) but the title sometimes contain it
 			title = title.replace(":", " -")
 			# path to save the file
@@ -160,6 +165,26 @@ def main(argv):
 					image_url = "https:" + image[0].replace("/imagecache/thumbview", "", 1)
 					print("Downloading IMAGE:", image_url)
 					download_to_file(filename, image_url, session, headers, False)
+
+				# Book details
+				if includeDetails:
+					product_url = book.xpath(".//div[contains(@class,'product-thumbnail')]//a/@href")
+					# get the product page
+					print ("Loading product page:", product_url[0])
+					product_page = session.get("https://www.packtpub.com" + product_url[0], verify=True, headers=headers)
+					product_tree = html.fromstring(product_page.content)
+					details = product_tree.xpath("//*[@id='main-book']//div[contains(@class,'book-info-wrapper')]")
+
+					if len(details) > 0:
+						details_dict = {'originalTitle':original_title}
+						details_dict['isbn'] = details[0].xpath(".//span[@itemprop='isbn']/text()")[0]
+						details_dict['pages'] = details[0].xpath(".//span[@itemprop='numberOfPages']/text()")[0]
+						details_dict['description'] = '<br>'.join(details[0].xpath(".//div[@itemprop='description']/p/text()"))
+
+						filename = os.path.join(path, title + " [DETAILS].json")
+						print ("Saving DETAILS")
+						with open(filename, 'w') as outfile:
+							json.dump(details_dict, outfile)
 
 
 if __name__ == "__main__":
