@@ -6,6 +6,9 @@ import requests
 import sys, getopt
 from lxml import html
 
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 # saves downloaded asset to a directory
 def download_to_file(directory, url, session, headers, prefix_url=True):
 	if not os.path.exists(directory):
