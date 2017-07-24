@@ -31,24 +31,14 @@ def main(argv):
 	email = ''
 	password = ''
 	directory = 'packtpub_media'
-<<<<<<< HEAD
-	fileTypes = 'pdf,mobi,epub,jpg,code'
-	errorMessage = 'Usage: downloader.py -e <email> -p <password> [-f <filetypes> -d <directory>]'
-
-	# get the command line arguments/options
-	try:
-		opts, args = getopt.getopt(argv,"ce:p:d:f:",["email=","pass=","directory=","files="])
-=======
-	formats = 'pdf,mobi,epub,jpg'
-	includeCode = False
+	formats = 'pdf,mobi,epub,jpg,code'
 	videosOnly = False
 	ebooksOnly = False
 	errorMessage = 'Usage: downloader.py -e <email> -p <password> [-f <formats> -d <directory> --include-code]'
 
 	# get the command line arguments/options
 	try:
-		opts, args = getopt.getopt(argv,"ce:p:d:f:",["email=","pass=","directory=","formats=","include-code","ebooksonly","videosonly"])
->>>>>>> added video/ebooks override options
+		opts, args = getopt.getopt(argv,"ce:p:d:f:",["email=","pass=","directory=","files=","ebooksonly","videosonly"])
 	except getopt.GetoptError:
 		print(errorMessage)
 		sys.exit(2)
@@ -61,19 +51,12 @@ def main(argv):
 			password = arg
 		elif opt in ('-d','--directory'):
 			directory = os.path.expanduser(arg) if '~' in arg else os.path.abspath(arg)
-<<<<<<< HEAD
 		elif opt in ('-f','--files'):
-			fileTypes = arg
-=======
-		elif opt in ('-f','--formats'):
 			formats = arg
-		elif opt in ('-c','--include-code'):
-			includeCode = True
 		elif opt in ('--videosonly'):
 			videosOnly = True
 		elif opt in ('--ebooksonly'):
 			ebooksOnly = True
->>>>>>> added video/ebooks override options
 	# check for books or video usage
 	includeBooks=False
 	includeVideos=False
@@ -193,13 +176,8 @@ def main(argv):
 						print("Downloading IMAGE:", image_url)
 						download_to_file(filename, image_url, session, headers, False)
 
-<<<<<<< HEAD
-		# loop through the Videos
-		if includeVideos:
-=======
 		# loop through the videos
 		if includeVideos and not ebooksOnly:
->>>>>>> added video/ebooks override options
 			for video in video_nodes:
 
 				# scrub the title
