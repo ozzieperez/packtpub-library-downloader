@@ -20,7 +20,7 @@ def download_to_file(directory, url, session, headers, prefix_url=True):
 		# save content in chunks: sometimes got memoryerror
 		for chunk in resource.iter_content(chunk_size=1024):
 			target.write(chunk)
-		
+
 		# dispose handle to the directory
 		target.close()
 
@@ -31,13 +31,13 @@ def main(argv):
 	email = ''
 	password = ''
 	directory = 'packtpub_media'
-	formats = 'pdf,mobi,epub,jpg'
+	fileTypes = 'pdf,mobi,epub,jpg,code'
 	includeCode = False
-	errorMessage = 'Usage: downloader.py -e <email> -p <password> [-f <formats> -d <directory> --include-code]'
+	errorMessage = 'Usage: downloader.py -e <email> -p <password> [-f <filetypes> -d <directory>]'
 
 	# get the command line arguments/options
 	try:
-		opts, args = getopt.getopt(argv,"ce:p:d:f:",["email=","pass=","directory=","formats=","include-code"])
+		opts, args = getopt.getopt(argv,"ce:p:d:f:",["email=","pass=","directory=","files="])
 	except getopt.GetoptError:
 		print(errorMessage)
 		sys.exit(2)
@@ -50,10 +50,8 @@ def main(argv):
 			password = arg
 		elif opt in ('-d','--directory'):
 			directory = os.path.expanduser(arg) if '~' in arg else os.path.abspath(arg)
-		elif opt in ('-f','--formats'):
-			formats = arg
-		elif opt in ('-c','--include-code'):
-			includeCode = True
+		elif opt in ('-f','--files'):
+			fileTypes = arg
 
 	# do we have the minimum required info
 	if not email or not password:
@@ -128,31 +126,31 @@ def main(argv):
 				image = book.xpath(".//div[contains(@class,'product-thumbnail')]//img/@src")
 
 				# pdf
-				if len(pdf) > 0 and 'pdf' in formats:
+				if len(pdf) > 0 and 'pdf' in fileTypes:
 					filename = os.path.join(path, title + ".pdf")
 					print("Downloading PDF:", pdf[0])
 					download_to_file(filename, pdf[0], session, headers)
 
 				# epub
-				if len(epub) > 0 and 'epub' in formats:
+				if len(epub) > 0 and 'epub' in fileTypes:
 					filename = os.path.join(path, title + ".epub")
 					print("Downloading EPUB:", epub[0])
 					download_to_file(filename, epub[0], session, headers)
 
 				# mobi
-				if len(mobi) > 0 and 'mobi' in formats:
+				if len(mobi) > 0 and 'mobi' in fileTypes:
 					filename = os.path.join(path, title + ".mobi")
 					print("Downloading MOBI:", mobi[0])
 					download_to_file(filename, mobi[0], session, headers)
 
 				# code
-				if len(code) > 0 and includeCode:
+				if len(code) > 0 and 'code' in fileTypes:
 					filename = os.path.join(path, title + " [CODE].zip")
 					print("Downloading CODE:", code[0])
 					download_to_file(filename, code[0], session, headers)
 
 				# Cover-image
-				if len(image) > 0 and 'jpg' in formats:
+				if len(image) > 0 and 'jpg' in fileTypes:
 					filename = os.path.join(path, title + " [Cover].jpg")
 					image_url = "https:" + image[0].replace("/imagecache/thumbview", "", 1)
 					print("Downloading IMAGE:", image_url)
