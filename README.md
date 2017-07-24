@@ -13,6 +13,10 @@ Automatically download all your eBooks and Videos. (See: [PacktPub Free Daily Bo
 	python downloader.py -e hello@world.com -p p@ssw0rd -f video,jpg,code -d ~/Desktop
 
 
+##### Video-Example: Download Videos, Cover-Image and source code to my Desktop
+	python downloader.py -e hello@world.com -p p@ssw0rd -f video,jpg -d ~/Desktop -c
+
+
 ### Options
 - *-e*, *--email* = Your login email
 - *-p*, *--password* = Your login password

@@ -34,7 +34,7 @@ def main(argv):
 	fileTypes = 'pdf,mobi,epub,jpg,code'
 	videosOnly = False
 	ebooksOnly = False
-	errorMessage = 'Usage: downloader.py -e <email> -p <password> [-f <filetypes> -d <directory> --include-code]'
+	errorMessage = 'Usage: downloader.py -e <email> -p <password> [-f <filetypes> -d <directory>]'
 
 	# get the command line arguments/options
 	try:
@@ -219,7 +219,6 @@ def main(argv):
 						image_url = "https:" + image[0].replace("/imagecache/thumbview", "", 1)
 						print("Downloading IMAGE:", image_url)
 						download_to_file(filename, image_url, session, headers, False)
-
 
 if __name__ == "__main__":
    main(sys.argv[1:])
