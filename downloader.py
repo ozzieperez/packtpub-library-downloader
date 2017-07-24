@@ -31,10 +31,10 @@ def main(argv):
 	email = ''
 	password = ''
 	directory = 'packtpub_media'
-	formats = 'pdf,mobi,epub,jpg,code'
+	fileTypes = 'pdf,mobi,epub,jpg,code'
 	videosOnly = False
 	ebooksOnly = False
-	errorMessage = 'Usage: downloader.py -e <email> -p <password> [-f <formats> -d <directory> --include-code]'
+	errorMessage = 'Usage: downloader.py -e <email> -p <password> [-f <filetypes> -d <directory> --include-code]'
 
 	# get the command line arguments/options
 	try:
@@ -52,7 +52,7 @@ def main(argv):
 		elif opt in ('-d','--directory'):
 			directory = os.path.expanduser(arg) if '~' in arg else os.path.abspath(arg)
 		elif opt in ('-f','--files'):
-			formats = arg
+			fileTypes = arg
 		elif opt in ('--videosonly'):
 			videosOnly = True
 		elif opt in ('--ebooksonly'):
@@ -135,7 +135,7 @@ def main(argv):
 					# in this way (the download happens only when the target path does not exist) the whole downloading is continuable
 					# the title sometimes contains some weird characters that python could not print
 					print('#################################################################')
-					print(title.encode(sys.stdout.encoding, errors='replace'))
+					print(title.encode(sys.stdout.encoding, errors='replace').decode())
 					print('#################################################################')
 
 					# get the download links
@@ -193,7 +193,7 @@ def main(argv):
 					# in this way (the download happens only when the target path does not exist) the whole downloading is continuable
 					# the title sometimes contains some weird characters that python could not print
 					print('#################################################################')
-					print(title.encode(sys.stdout.encoding, errors='replace'))
+					print(title.encode(sys.stdout.encoding, errors='replace').decode())
 					print('#################################################################')
 
 					# get the download links
