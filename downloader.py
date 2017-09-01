@@ -20,13 +20,11 @@ def download_to_file(directory, url, session, headers, prefix_url=True):
 		# save content in chunks: sometimes got memoryerror
 		for chunk in resource.iter_content(chunk_size=1024):
 			target.write(chunk)
-
+		
 		# dispose handle to the directory
 		target.close()
 
 def main(argv):
-	reload(sys)
-	sys.setdefaultencoding('utf8')
 	headers = {
 		"User-Agent": "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 " +
 		"(KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"}
