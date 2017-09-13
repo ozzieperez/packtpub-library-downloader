@@ -4,25 +4,38 @@ from __future__ import print_function
 import os
 import requests
 import sys, getopt
+import shutil
 from lxml import html
 
 # saves downloaded asset to a directory
 def download_to_file(directory, url, session, headers, prefix_url=True):
 	if not os.path.exists(directory):
-		if prefix_url:
-			url = "https://www.packtpub.com" + url
+            dirt = directory.split("/") #split string into a list
+            if prefix_url:
+                    url = "https://www.packtpub.com" + url
+            try:
+                resource = session.get(url, verify=True, stream=True, headers=headers)
 
-		resource = session.get(url, verify=True, stream=True, headers=headers)
+                # open the directory to write to
+                target = open(directory, 'wb')
 
-		# open the directory to write to
-		target = open(directory, 'wb')
-
-		# save content in chunks: sometimes got memoryerror
-		for chunk in resource.iter_content(chunk_size=1024):
-			target.write(chunk)
-		
-		# dispose handle to the directory
-		target.close()
+                # save content in chunks: sometimes got memoryerror
+                for chunk in resource.iter_content(chunk_size=1024):
+                        target.write(chunk)
+                
+                # dispose handle to the directory
+                target.close()
+                print("Saved "+dirt[len(dirt)-1])
+            except requests.exceptions.ConnectionError as e:
+                dirRm = ""
+                for temp in dirt:
+                    if "." not in temp:
+                        dirRm += temp+"/"
+                print("Deleting "+dirRm)
+                shutil.rmtree(dirRm)
+                print("Deleted "+dirRm)
+                print(e)
+                sys.exit(1)
 
 def main(argv):
 	headers = {
