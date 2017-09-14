@@ -60,37 +60,52 @@ def process_and_trigger_download(title,book,directory,formats,includeCode,sessio
     if len(pdf) > 0 and 'pdf' in formats:
         filename = title + ".pdf"
         path_to_file = os.path.join(path, filename)
-        print("Downloading PDF:", pdf[0])
-        download_to_file(path_to_file, filename, pdf[0], session, headers)
+        if not os.path.exists(path_to_file):
+            print("Downloading PDF:{0} -> {1}".format(pdf[0],filename))
+            download_to_file(path_to_file, filename, pdf[0], session, headers)
+        else:
+            print(filename+" already present not being downloaded.")
 
     # epub
     if len(epub) > 0 and 'epub' in formats:
         filename = title + ".epub"
         path_to_file = os.path.join(path, filename)
-        print("Downloading EPUB:", epub[0])
-        download_to_file(path_to_file, filename, epub[0], session, headers)
+        if not os.path.exists(path_to_file):
+            print("Downloading EPUB:{0} -> {1}".format(epub[0],filename))
+            download_to_file(path_to_file, filename, epub[0], session, headers)
+        else:
+            print(filename+" already present not being downloaded.")
 
     # mobi
     if len(mobi) > 0 and 'mobi' in formats:
         filename = title + ".mobi"
         path_to_file = os.path.join(path, filename)
-        print("Downloading MOBI:", mobi[0])
-        download_to_file(path_to_file, filename, mobi[0], session, headers)
+        if not os.path.exists(path_to_file):
+            print("Downloading MOBI:{0} -> {1}".format(mobi[0],filename))
+            download_to_file(path_to_file, filename, mobi[0], session, headers)
+        else:
+            print(filename+" already present not being downloaded.")
 
     # code
     if len(code) > 0 and includeCode:
         filename = title + " [CODE].zip"
         path_to_file = os.path.join(path, filename)
-        print("Downloading CODE:", code[0])
-        download_to_file(path_to_file, filename, code[0], session, headers)
+        if not os.path.exists(path_to_file):
+            print("Downloading CODE:{0} -> {1}".format(code[0],filename))
+            download_to_file(path_to_file, filename, code[0], session, headers)
+        else:
+            print(filename+" already present not being downloaded.")
 
     # Cover-image
     if len(image) > 0 and 'jpg' in formats:
         filename = title + " [Cover].jpg"
         path_to_file = os.path.join(path, filename)
-        image_url = "https:" + image[0].replace("/imagecache/thumbview", "", 1)
-        print("Downloading IMAGE:", image_url)
-        download_to_file(path_to_file, filename, image_url, session, headers, False)
+        if not os.path.exists(path_to_file):
+            image_url = "https:" + image[0].replace("/imagecache/thumbview", "", 1)
+            print("Downloading IMAGE:{0} -> {1}".format(image_url,filename))
+            download_to_file(path_to_file, filename, image_url, session, headers, False)
+        else:
+            print(filename+" already present not being downloaded.")
 
 
 def main(argv):
@@ -201,4 +216,7 @@ def main(argv):
                 process_and_trigger_download(title,book,directory,formats,includeCode,session,headers)
 
 if __name__ == "__main__":
+
+    reload(sys)  
+    sys.setdefaultencoding('utf8')
     main(sys.argv[1:])
