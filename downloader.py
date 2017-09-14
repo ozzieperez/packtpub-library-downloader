@@ -30,7 +30,7 @@ def download_to_file(directory, filename, url, session, headers, prefix_url=True
                 directory_to_remove_on_failure = ""
                 for element in list_of_path_elements:
                     if "." not in element:
-                        directory_to_remove_on_failure += temp+"/"
+                        directory_to_remove_on_failure += element+"/"
                 print("Deleting "+directory_to_remove_on_failure)
                 shutil.rmtree(directory_to_remove_on_failure)
                 print("Deleted "+directory_to_remove_on_failure)
