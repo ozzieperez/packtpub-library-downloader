@@ -2,21 +2,23 @@
 
 from __future__ import print_function
 import os
+from os import walk
 import requests
 import sys, getopt
 import shutil
 from lxml import html
 
 # saves downloaded asset to a directory
-def download_to_file(directory, filename, url, session, headers, prefix_url=True):
-    if not os.path.exists(directory):
+def download_to_file(directory, isDirectoryEmpty, filename, url, session, headers, prefix_url=True):
+    path_to_file = os.path.join(directory, filename)
+    if not os.path.exists(path_to_file):
         if prefix_url:
             url = "https://www.packtpub.com" + url
             try:
                 resource = session.get(url, verify=True, stream=True, headers=headers)
 
                 # open the directory to write to
-                target = open(directory, 'wb')
+                target = open(path_to_file, 'wb')
 
                 # save content in chunks: sometimes got memoryerror
                 for chunk in resource.iter_content(chunk_size=1024):
@@ -26,15 +28,17 @@ def download_to_file(directory, filename, url, session, headers, prefix_url=True
                 target.close()
                 print("Saved "+filename)
             except requests.exceptions.ConnectionError as e:
-                list_of_path_elements = directory.split("/") 
-                directory_to_remove_on_failure = ""
-                for element in list_of_path_elements:
-                    if "." not in element:
-                        directory_to_remove_on_failure += element+"/"
-                print("Deleting "+directory_to_remove_on_failure)
-                shutil.rmtree(directory_to_remove_on_failure)
-                print("Deleted "+directory_to_remove_on_failure)
-                sys.exit(1)
+                if isDirectoryEmpty == True:
+                    print("The directory was empty to begin with so will delete the whole directory")
+                    print("Deleting "+directory)
+                    shutil.rmtree(directory)
+                    print("Deleted "+directory)
+                else:
+                    print("The directory was not empty so only removing this failed download if present")
+                    if (os.path.exists(path_to_file)):
+                        os.remove(path_to_file)
+                    else:
+                        print("No file was written nothing to delete")
 
 def process_and_trigger_download(title,book,directory,formats,includeCode,session,headers):
 
@@ -49,6 +53,15 @@ def process_and_trigger_download(title,book,directory,formats,includeCode,sessio
     print(title.encode(sys.stdout.encoding, errors='replace').decode())
     print('###########################################################################')
 
+    files_in_directory = []
+    directory_empty = False
+    for (_, _, filenames) in walk(path):
+        files_in_directory.extend(filenames)
+    if not files_in_directory:
+        directory_empty = True
+    else:
+        directory_empty = False
+
     # get the download links
     pdf = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/pdf')]/@href")
     epub = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/epub')]/@href")
@@ -62,7 +75,7 @@ def process_and_trigger_download(title,book,directory,formats,includeCode,sessio
         path_to_file = os.path.join(path, filename)
         if not os.path.exists(path_to_file):
             print("Downloading PDF:{0} -> {1}".format(pdf[0],filename))
-            download_to_file(path_to_file, filename, pdf[0], session, headers)
+            download_to_file(path, directory_empty, filename, pdf[0], session, headers)
         else:
             print(filename+" already present not being downloaded.")
 
@@ -72,7 +85,7 @@ def process_and_trigger_download(title,book,directory,formats,includeCode,sessio
         path_to_file = os.path.join(path, filename)
         if not os.path.exists(path_to_file):
             print("Downloading EPUB:{0} -> {1}".format(epub[0],filename))
-            download_to_file(path_to_file, filename, epub[0], session, headers)
+            download_to_file(path, directory_empty, filename, epub[0], session, headers)
         else:
             print(filename+" already present not being downloaded.")
 
@@ -82,7 +95,7 @@ def process_and_trigger_download(title,book,directory,formats,includeCode,sessio
         path_to_file = os.path.join(path, filename)
         if not os.path.exists(path_to_file):
             print("Downloading MOBI:{0} -> {1}".format(mobi[0],filename))
-            download_to_file(path_to_file, filename, mobi[0], session, headers)
+            download_to_file(path, directory_empty, filename, mobi[0], session, headers)
         else:
             print(filename+" already present not being downloaded.")
 
@@ -92,7 +105,7 @@ def process_and_trigger_download(title,book,directory,formats,includeCode,sessio
         path_to_file = os.path.join(path, filename)
         if not os.path.exists(path_to_file):
             print("Downloading CODE:{0} -> {1}".format(code[0],filename))
-            download_to_file(path_to_file, filename, code[0], session, headers)
+            download_to_file(path, directory_empty, filename, code[0], session, headers)
         else:
             print(filename+" already present not being downloaded.")
 
@@ -103,7 +116,7 @@ def process_and_trigger_download(title,book,directory,formats,includeCode,sessio
         if not os.path.exists(path_to_file):
             image_url = "https:" + image[0].replace("/imagecache/thumbview", "", 1)
             print("Downloading IMAGE:{0} -> {1}".format(image_url,filename))
-            download_to_file(path_to_file, filename, image_url, session, headers, False)
+            download_to_file(path, directory_empty, filename, image_url, session, headers, False)
         else:
             print(filename+" already present not being downloaded.")
 
