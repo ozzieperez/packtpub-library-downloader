@@ -15,7 +15,6 @@ Automatically download all your eBooks. (See: [PacktPub Free Daily Book](https:/
 - *-f*, *--formats* = File formats to download. Default is "pdf,mobi,epub,jpg"
 - *-d*, *--directory* = Directory to download into. Default is "packtpub_media/" in the current directory
 - *-c*, *--include-code* = Flag to include code files, if any
-- *-i*, *--ignore-list* = Specifies the ignore list file. This file has a list of titles for books to be skipped during the download process. 
 
 ## Dependencies:
 
