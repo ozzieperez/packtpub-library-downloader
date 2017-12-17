@@ -62,26 +62,26 @@ def save_book_details(book, title, directory, session, headers):
     product_tree = html.fromstring(product_page.content)
 
     # the book details section
-    details = product_tree.xpath("//*[@id='main-book']//div[contains(@class,'book-info-wrapper')]")
+    info = product_tree.xpath("//*[@id='main-book']//div[contains(@class,'book-info-wrapper')]")
 
     # any details?
-    if len(details) > 0:
+    if len(info) > 0:
 
         # unformatted book title
         original_title = book.xpath("@title")[0]
 
         # the json elements
-        details_dict = {'originalTitle':original_title}
-        details_dict['isbn'] = details[0].xpath(".//span[@itemprop='isbn']/text()")[0]
-        details_dict['pages'] = details[0].xpath(".//span[@itemprop='numberOfPages']/text()")[0]
-        details_dict['description'] = '<br>'.join(details[0].xpath(".//div[@itemprop='description']/p/text()"))
+        info_dict = {'originalTitle':original_title}
+        info_dict['isbn'] = info[0].xpath(".//span[@itemprop='isbn']/text()")[0]
+        info_dict['pages'] = info[0].xpath(".//span[@itemprop='numberOfPages']/text()")[0]
+        info_dict['description'] = '<br>'.join(info[0].xpath(".//div[@itemprop='description']/p/text()"))
 
-        print ("Saving DETAILS")
+        print ("Saving INFO")
 
         # save to file
         filename = os.path.join(directory, title + ".json")
         with open(filename, 'w') as outfile:
-            json.dump(details_dict, outfile)
+            json.dump(info_dict, outfile)
 
 
 # prepares book for download
@@ -140,7 +140,7 @@ def download_book(book, directory, assets, session, headers):
         download_to_file(filename, image_url, session, headers, False)
 
     # book details
-    if 'details' in assets:
+    if 'info' in assets:
         save_book_details(book, title, book_directory, session, headers)
 
     # delete directory if it's empty

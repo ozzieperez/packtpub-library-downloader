@@ -21,7 +21,7 @@ Automatically download all your eBooks and videos. (See: [PacktPub Free Daily Bo
 - *-p*, *--password* = Your login password
 - *-d*, *--directory* = Directory to download into. Default is "packtpub_media/" in the current directory
 - *-v*, *--videos* = Assets to download. Options are: *video,cover,code*
-- *-b*, *--books* = Assets to download. Options are: *pdf,mobi,epub,cover,code,details*
+- *-b*, *--books* = Assets to download. Options are: *pdf,mobi,epub,cover,code,info*
 
 **Video Assets**
 
@@ -36,7 +36,7 @@ Automatically download all your eBooks and videos. (See: [PacktPub Free Daily Bo
 - *epub*: EPUB format
 - *cover*: Cover image
 - *code*: Accompanying source code
-- *details*: Creates a JSON file with the title, # of pages, and description. (note: it slows downloads)
+- *info*: Creates a JSON file with the title, # of pages, and description. (note: it slows downloads)
 
 
 ## Dependencies:
