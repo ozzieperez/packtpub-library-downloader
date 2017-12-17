@@ -20,8 +20,8 @@ Automatically download all your eBooks and videos. (See: [PacktPub Free Daily Bo
 - *-e*, *--email* = Your login email
 - *-p*, *--password* = Your login password
 - *-d*, *--directory* = Directory to download into. Default is "packtpub_media/" in the current directory
-- *-b*, *--books* = EBook assets. Options are: *pdf,mobi,epub,cover,code*
-- *-v*, *--videos* = Video assets. Options are: *video,cover,code*
+- *-b*, *--books* = EBook assets to download. Options are: *pdf,mobi,epub,cover,code*
+- *-v*, *--videos* = Video assets to download. Options are: *video,cover,code*
 
 
 ## Dependencies:
