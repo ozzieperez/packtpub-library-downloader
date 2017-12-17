@@ -13,15 +13,30 @@ Automatically download all your eBooks and videos. (See: [PacktPub Free Daily Bo
 	python downloader.py -e hello@world.com -p p@ssw0rd -d ~/Desktop/packt -v video,cover,code
 
 ##### Example: Download everything
-	python downloader.py -e hello@world.com -p p@ssw0rd -d ~/Desktop/packt -b pdf,epub,mobi,cover,code -v video,cover,code
+	python downloader.py -e hello@world.com -p p@ssw0rd -d ~/Desktop/packt -b pdf,epub,mobi,cover,code,details -v video,cover,code
 
 
-### Options
+## Commandline Options
 - *-e*, *--email* = Your login email
 - *-p*, *--password* = Your login password
 - *-d*, *--directory* = Directory to download into. Default is "packtpub_media/" in the current directory
-- *-b*, *--books* = EBook assets to download. Options are: *pdf,mobi,epub,cover,code*
-- *-v*, *--videos* = Video assets to download. Options are: *video,cover,code*
+- *-v*, *--videos* = Assets to download. Options are: *video,cover,code*
+- *-b*, *--books* = Assets to download. Options are: *pdf,mobi,epub,cover,code,details*
+
+**Video Asset Options**
+
+- *video*: The video file
+- *cover*: Cover image
+- *code*: Accompanying source code
+
+**Book Asset Options**
+
+- *pdf*: PDF format
+- *mobi*: MOBI format
+- *epub*: EPUB format
+- *cover*: Cover image
+- *code*: Accompanying source code
+- *details*: Creates a JSON file with the title, # of pages, and description. (slows downloads)
 
 
 ## Dependencies:

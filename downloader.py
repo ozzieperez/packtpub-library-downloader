@@ -4,6 +4,7 @@ from __future__ import print_function
 import os
 import requests
 import sys, getopt
+import json
 from lxml import html
 
 # saves downloaded asset to a directory
@@ -50,6 +51,28 @@ def download_to_file(filepath, url, session, headers, prefix_url=True):
             sys.exit(1)
     else:
         print("Skipping download: File already exists.")
+
+
+def save_book_details(book, title, directory, session, headers):
+    original_title = book.xpath("@title")[0]
+    product_url = book.xpath(".//div[contains(@class,'product-thumbnail')]//a/@href")
+    
+    # get the product page
+    product_page = session.get("https://www.packtpub.com" + product_url[0], verify=True, headers=headers)
+    product_tree = html.fromstring(product_page.content)
+    details = product_tree.xpath("//*[@id='main-book']//div[contains(@class,'book-info-wrapper')]")
+
+    if len(details) > 0:
+        details_dict = {'originalTitle':original_title}
+        details_dict['isbn'] = details[0].xpath(".//span[@itemprop='isbn']/text()")[0]
+        details_dict['pages'] = details[0].xpath(".//span[@itemprop='numberOfPages']/text()")[0]
+        details_dict['description'] = '<br>'.join(details[0].xpath(".//div[@itemprop='description']/p/text()"))
+
+        print ("Saving DETAILS")
+
+        filename = os.path.join(directory, title + ".json")
+        with open(filename, 'w') as outfile:
+            json.dump(details_dict, outfile)
 
 
 # prepares book for download
@@ -108,6 +131,10 @@ def download_book(book, directory, assets, session, headers):
         image_url = "https:" + image[0].replace("/imagecache/thumbview", "", 1)
         print("Downloading IMAGE")
         download_to_file(filename, image_url, session, headers, False)
+
+    # book details
+    if 'details' in assets:
+        save_book_details(book, title, book_directory, session, headers)
 
     # delete directory if it's empty
     if not os.listdir(book_directory):
