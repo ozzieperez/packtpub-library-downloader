@@ -13,7 +13,7 @@ Automatically download all your eBooks and videos. (See: [PacktPub Free Daily Bo
 	python downloader.py -e hello@world.com -p p@ssw0rd -d ~/Desktop/packt -v video,cover,code
 
 ##### Example: Download everything
-	python downloader.py -e hello@world.com -p p@ssw0rd -d ~/Desktop/packt -b pdf,epub,mobi,cover,code,details -v video,cover,code
+	python downloader.py -e hello@world.com -p p@ssw0rd -d ~/Desktop/packt -b pdf,epub,mobi,cover,code,info -v video,cover,code
 
 
 ## Commandline Options
