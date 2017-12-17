@@ -6,13 +6,13 @@ Automatically download all your eBooks and videos. (See: [PacktPub Free Daily Bo
 ## How to use it:
 	python downloader.py -e <email> -p <password> [-d <directory> -b <book assets> -v <video assets>]
 
-##### Example: Download PDFs, EPUBs, and source code to a directory on your Desktop
+##### Example: Download books in PDF and EPUB formats and accompanying source code
 	python downloader.py -e hello@world.com -p p@ssw0rd -d ~/Desktop/packt -b pdf,epub,code
 
-##### Example: Download videos, cover image, and source code to a directory on your Desktop
+##### Example: Download videos, their cover image, and accompanying source code
 	python downloader.py -e hello@world.com -p p@ssw0rd -d ~/Desktop/packt -v video,cover,code
 
-##### Example: Download everything to a directory on your Desktop
+##### Example: Download everything
 	python downloader.py -e hello@world.com -p p@ssw0rd -d ~/Desktop/packt -b pdf,epub,mobi,cover,code -v video,cover,code
 
 
