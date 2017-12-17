@@ -23,13 +23,13 @@ Automatically download all your eBooks and videos. (See: [PacktPub Free Daily Bo
 - *-v*, *--videos* = Assets to download. Options are: *video,cover,code*
 - *-b*, *--books* = Assets to download. Options are: *pdf,mobi,epub,cover,code,details*
 
-**Video Asset Options**
+**Video Assets**
 
 - *video*: The video file
 - *cover*: Cover image
 - *code*: Accompanying source code
 
-**Book Asset Options**
+**Book Assets**
 
 - *pdf*: PDF format
 - *mobi*: MOBI format
