@@ -57,7 +57,7 @@ def download_book(book, directory, assets, session, headers):
 
     # scrub the title
     # sometimes ends with space, therefore the strip call
-    title = book.xpath("@title")[0].replace("/","-").replace('’','').replace(" [eBook]","").replace(":", " -").strip()
+    title = book.xpath("@title")[0].replace("/","-").replace(" [eBook]","").replace(":", " -").strip()
 
     # path to save the file
     book_directory = os.path.join(directory, title)
@@ -118,7 +118,7 @@ def download_video(video, directory, assets, session, headers):
 
     # scrub the title
     # sometimes ends with space, therefore the strip call
-    title = video.xpath("@title")[0].replace("/","-").replace('’','').replace(" [Video]","").replace(":", " -").strip()
+    title = video.xpath("@title")[0].replace("/","-").replace(" [Video]","").replace(":", " -").strip()
 
     # path to save the file
     video_directory = os.path.join(directory, title)
