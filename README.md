@@ -36,7 +36,7 @@ Automatically download all your eBooks and videos. (See: [PacktPub Free Daily Bo
 - *epub*: EPUB format
 - *cover*: Cover image
 - *code*: Accompanying source code
-- *info*: Creates a JSON file with the title, # of pages, and description. (note: it slows downloads)
+- *info*: Creates a JSON file with the title, ISBN, # of pages, and description. (note: it slows downloads)
 
 
 ## Dependencies:
