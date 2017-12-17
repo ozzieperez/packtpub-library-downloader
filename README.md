@@ -1,20 +1,28 @@
 # PacktPub Library Downloader
 
-Automatically download all your eBooks. (See: [PacktPub Free Daily Book](https://www.packtpub.com/packt/offers/free-learning))
+Automatically download all your eBooks and videos. (See: [PacktPub Free Daily Book](https://www.packtpub.com/packt/offers/free-learning))
 
 
 ## How to use it:
-	python downloader.py -e <email> -p <password> [-f <formats> -d <directory> --include-code]
+	python downloader.py -e <email> -p <password> [-d <directory> -b <book assets> -v <video assets>]
 
-##### Example: Download PDFs, EPUBs, and source code to my Desktop
-	python downloader.py -e hello@world.com -p p@ssw0rd -f pdf,epub -d ~/Desktop -c
+##### Example: Download PDFs, EPUBs, and source code to a directory on your Desktop
+	python downloader.py -e hello@world.com -p p@ssw0rd -d ~/Desktop/packt -b pdf,epub,code
+
+##### Example: Download videos, cover image, and source code to a directory on your Desktop
+	python downloader.py -e hello@world.com -p p@ssw0rd -d ~/Desktop/packt -v video,cover,code
+
+##### Example: Download everything to a directory on your Desktop
+	python downloader.py -e hello@world.com -p p@ssw0rd -d ~/Desktop/packt -b pdf,epub,mobi,cover,code -v video,cover,code
+
 
 ### Options
 - *-e*, *--email* = Your login email
 - *-p*, *--password* = Your login password
-- *-f*, *--formats* = File formats to download. Default is "pdf,mobi,epub,jpg"
 - *-d*, *--directory* = Directory to download into. Default is "packtpub_media/" in the current directory
-- *-c*, *--include-code* = Flag to include code files, if any
+- *-b*, *--books* = EBook assets. Options are: *pdf,mobi,epub,cover,code*
+- *-v*, *--videos* = Video assets. Options are: *video,cover,code*
+
 
 ## Dependencies:
 
@@ -22,7 +30,7 @@ Automatically download all your eBooks. (See: [PacktPub Free Daily Book](https:/
 * [Requests](http://docs.python-requests.org/en/latest/) for HTTP requests:
 
 		pip install requests
-	
+
 * [lxml](http://lxml.de/) for HTML parsing:
 
 		pip install lxml
