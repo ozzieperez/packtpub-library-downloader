@@ -1,4 +1,4 @@
-# PacktPub Library Downloader
+# PacktPub Downloader
 
 Automatically download all your eBooks and videos. (See: [PacktPub Free Daily Book](https://www.packtpub.com/packt/offers/free-learning))
 
