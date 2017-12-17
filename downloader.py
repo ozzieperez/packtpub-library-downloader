@@ -53,16 +53,24 @@ def download_to_file(filepath, url, session, headers, prefix_url=True):
         print("Skipping download: File already exists.")
 
 
+# creates a json file with info
 def save_book_details(book, title, directory, session, headers):
-    original_title = book.xpath("@title")[0]
-    product_url = book.xpath(".//div[contains(@class,'product-thumbnail')]//a/@href")
     
-    # get the product page
+    # fetch the product page
+    product_url = book.xpath(".//div[contains(@class,'product-thumbnail')]//a/@href")
     product_page = session.get("https://www.packtpub.com" + product_url[0], verify=True, headers=headers)
     product_tree = html.fromstring(product_page.content)
+
+    # the book details section
     details = product_tree.xpath("//*[@id='main-book']//div[contains(@class,'book-info-wrapper')]")
 
+    # any details?
     if len(details) > 0:
+
+        # unformatted book title
+        original_title = book.xpath("@title")[0]
+
+        # the json elements
         details_dict = {'originalTitle':original_title}
         details_dict['isbn'] = details[0].xpath(".//span[@itemprop='isbn']/text()")[0]
         details_dict['pages'] = details[0].xpath(".//span[@itemprop='numberOfPages']/text()")[0]
@@ -70,6 +78,7 @@ def save_book_details(book, title, directory, session, headers):
 
         print ("Saving DETAILS")
 
+        # save to file
         filename = os.path.join(directory, title + ".json")
         with open(filename, 'w') as outfile:
             json.dump(details_dict, outfile)
@@ -79,7 +88,6 @@ def save_book_details(book, title, directory, session, headers):
 def download_book(book, directory, assets, session, headers):
 
     # scrub the title
-    # sometimes ends with space, therefore the strip call
     title = book.xpath("@title")[0].replace("/","-").replace(" [eBook]","").replace(":", " -").strip()
 
     # path to save the file
@@ -89,7 +97,6 @@ def download_book(book, directory, assets, session, headers):
     if not os.path.exists(book_directory):
         os.makedirs(book_directory)
 
-    # in this way (the download happens only when the target path does not exist) the whole downloading is continuable
     # the title sometimes contains some weird characters that python could not print
     print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
     print(title.encode(sys.stdout.encoding, errors='replace').decode())
@@ -141,10 +148,10 @@ def download_book(book, directory, assets, session, headers):
         os.rmdir(book_directory)
 
 
+# download video
 def download_video(video, directory, assets, session, headers):
 
     # scrub the title
-    # sometimes ends with space, therefore the strip call
     title = video.xpath("@title")[0].replace("/","-").replace(" [Video]","").replace(":", " -").strip()
 
     # path to save the file
@@ -154,7 +161,6 @@ def download_video(video, directory, assets, session, headers):
     if not os.path.exists(video_directory):
         os.makedirs(video_directory)
 
-    # in this way (the download happens only when the target path does not exist) the whole downloading is continuable
     # the title sometimes contains some weird characters that python could not print
     print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
     print(title.encode(sys.stdout.encoding, errors='replace').decode())
