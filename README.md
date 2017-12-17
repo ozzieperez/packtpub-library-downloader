@@ -3,7 +3,7 @@
 Automatically download all your eBooks and videos. (See: [PacktPub Free Daily Book](https://www.packtpub.com/packt/offers/free-learning))
 
 
-## How to use it:
+## Usage:
 	python downloader.py -e <email> -p <password> [-d <directory> -b <book assets> -v <video assets>]
 
 ##### Example: Download books in PDF and EPUB formats and accompanying source code
