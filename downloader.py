@@ -49,18 +49,18 @@ def download_to_file(filepath, url, session, headers, prefix_url=True):
             # terminate program
             sys.exit(1)
     else:
-        print("Skipping download, since file is already present.")
+        print("Skipping download: File already exists.")
 
 
 # prepares book for download
-def download_book(book, root_directory, formats, includeCode, session, headers):
+def download_book(book, directory, assets, session, headers):
 
     # scrub the title
     # sometimes ends with space, therefore the strip call
     title = book.xpath("@title")[0].replace("/","-").replace(" [eBook]","").replace(":", " -").strip()
 
     # path to save the file
-    book_directory = os.path.join(root_directory, title)
+    book_directory = os.path.join(directory, title)
 
     # create the directory if doesn't exist
     if not os.path.exists(book_directory):
@@ -68,9 +68,8 @@ def download_book(book, root_directory, formats, includeCode, session, headers):
 
     # in this way (the download happens only when the target path does not exist) the whole downloading is continuable
     # the title sometimes contains some weird characters that python could not print
-    print('###########################################################################')
+    print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
     print(title.encode(sys.stdout.encoding, errors='replace').decode())
-    print('###########################################################################')
 
     # get the download links
     pdf = book.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/pdf')]/@href")
@@ -80,34 +79,34 @@ def download_book(book, root_directory, formats, includeCode, session, headers):
     image = book.xpath(".//div[contains(@class,'product-thumbnail')]//img/@src")
 
     # pdf
-    if len(pdf) > 0 and 'pdf' in formats:
+    if len(pdf) > 0 and 'pdf' in assets:
         filename = os.path.join(book_directory, title + ".pdf")
-        print("Downloading PDF: {0}".format(filename))
+        print("Downloading PDF")
         download_to_file(filename, pdf[0], session, headers)
 
     # epub
-    if len(epub) > 0 and 'epub' in formats:
+    if len(epub) > 0 and 'epub' in assets:
         filename = os.path.join(book_directory, title + ".epub")
-        print("Downloading EPUB: {0}".format(filename))
+        print("Downloading EPUB")
         download_to_file(filename, epub[0], session, headers)
 
     # mobi
-    if len(mobi) > 0 and 'mobi' in formats:
+    if len(mobi) > 0 and 'mobi' in assets:
         filename = os.path.join(book_directory, title + ".mobi")
-        print("Downloading MOBI: {0}".format(filename))
+        print("Downloading MOBI")
         download_to_file(filename, mobi[0], session, headers)
 
     # code
-    if len(code) > 0 and includeCode:
+    if len(code) > 0 and 'code' in assets:
         filename = os.path.join(book_directory, title + " [CODE].zip")
-        print("Downloading CODE: {0}".format(filename))
+        print("Downloading CODE")
         download_to_file(filename, code[0], session, headers)
 
     # cover image
-    if len(image) > 0 and 'jpg' in formats:
+    if len(image) > 0 and 'cover' in assets:
         filename = os.path.join(book_directory, title + ".jpg")
         image_url = "https:" + image[0].replace("/imagecache/thumbview", "", 1)
-        print("Downloading IMAGE: {0}".format(filename))
+        print("Downloading IMAGE")
         download_to_file(filename, image_url, session, headers, False)
 
     # delete directory if it's empty
@@ -115,20 +114,67 @@ def download_book(book, root_directory, formats, includeCode, session, headers):
         os.rmdir(book_directory)
 
 
+def download_video(video, directory, assets, session, headers):
+
+    # scrub the title
+    # sometimes ends with space, therefore the strip call
+    title = video.xpath("@title")[0].replace("/","-").replace(" [Video]","").replace(":", " -").strip()
+
+    # path to save the file
+    video_directory = os.path.join(directory, title)
+
+    # create the directory if doesn't exist
+    if not os.path.exists(video_directory):
+        os.makedirs(video_directory)
+
+    # in this way (the download happens only when the target path does not exist) the whole downloading is continuable
+    # the title sometimes contains some weird characters that python could not print
+    print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+    print(title.encode(sys.stdout.encoding, errors='replace').decode())
+
+    # get the download links
+    code = video.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/code_download')]/@href")
+    image = video.xpath(".//div[contains(@class,'product-thumbnail')]//img/@src")
+    video = video.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/video')]/@href")
+
+    # video
+    if len(video) > 0 and 'video' in assets:
+        filename = os.path.join(video_directory, title + " [VIDEO].zip")
+        print("Downloading VIDEO")
+        download_to_file(filename, video[0], session, headers)
+
+    # code
+    if len(code) > 0 and 'code' in assets:
+        filename = os.path.join(video_directory, title + " [CODE].zip")
+        print("Downloading CODE")
+        download_to_file(filename, code[0], session, headers)
+
+    # cover image
+    if len(image) > 0 and 'cover' in assets:
+        filename = os.path.join(video_directory, title + ".jpg")
+        image_url = "https:" + image[0].replace("/imagecache/thumbview", "", 1)
+        print("Downloading IMAGE")
+        download_to_file(filename, image_url, session, headers, False)
+
+    # delete directory if it's empty
+    if not os.listdir(video_directory):
+        os.rmdir(video_directory)
+
+
 def main(argv):
     headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 " +
             "(KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"}
-    email = ''
-    password = ''
+    email = None
+    password = None
     root_directory = 'packtpub_media'
-    formats = 'pdf,mobi,epub,jpg'
-    includeCode = False
-    errorMessage = 'Usage: downloader.py -e <email> -p <password> [-f <formats> -d <directory> --include-code]'
+    book_assets = None # 'pdf,mobi,epub,cover,code'
+    video_assets = None # 'video,cover,code'
+    errorMessage = 'Usage: downloader.py -e <email> -p <password> [-d <directory> -b <book assets>  -v <video assets>]'
 
     # get the command line arguments/options
     try:
-        opts, args = getopt.getopt(argv,"ci:e:p:d:f:",["email=","pass=","directory=","formats=","include-code"])
+        opts, args = getopt.getopt(argv,"e:p:d:b:v:",["email=","pass=","directory=","books=","videos="])
     except getopt.GetoptError:
         print(errorMessage)
         sys.exit(2)
@@ -141,22 +187,22 @@ def main(argv):
             password = arg
         elif opt in ('-d','--directory'):
             root_directory = os.path.expanduser(arg) if '~' in arg else os.path.abspath(arg)
-        elif opt in ('-f','--formats'):
-            formats = arg
-        elif opt in ('-c','--include-code'):
-            includeCode = True
+        elif opt in ('-b','--books'):
+            book_assets = arg
+        elif opt in ('-v','--videos'):
+            video_assets = arg
 
-    # do we have the minimum required info
+    # do we have the minimum required info?
     if not email or not password:
         print(errorMessage)
         sys.exit(2)
 
-    # create a session
+    # create an http session
     session = requests.Session()
 
     print("Attempting to login...")
 
-    # initial request to get the "csrf token" for the login
+    # request to get the "csrf token" for the login
     url = "https://www.packtpub.com/"
     start_req = session.get(url, verify=True, headers=headers)
 
@@ -175,27 +221,54 @@ def main(argv):
     # login
     session.post(url, data=login_data, verify=True, headers=headers)
 
-    # get the ebooks page
-    books_page = session.get("https://www.packtpub.com/account/my-ebooks", verify=True, headers=headers)
-    books_tree = html.fromstring(books_page.content)
+    # check if successful login by getting the account page and check if redirected to 'register' page
+    account_page = session.get("https://www.packtpub.com/account", verify=True, headers=headers)
+    accountpage_tree = html.fromstring(account_page.content)
 
     # login successful?
-    if "Register" in books_tree.xpath("//title/text()")[0]:
+    if "Register" in accountpage_tree.xpath("//title/text()")[0]: # redirects to the 'Register' page if login fails
         print("Invalid login.")
 
     # we're in, start downloading
     else:
         print("Logged in successfully!")
 
-        # any books?
-        book_nodes = books_tree.xpath("//div[@id='product-account-list']/div[contains(@class,'product-line unseen')]")
+        if book_assets:
 
-        print("Found %s books" % len(book_nodes))
+            # get the list of books
+            books_page = session.get("https://www.packtpub.com/account/my-ebooks", verify=True, headers=headers)
+            books_tree = html.fromstring(books_page.content)
+            book_nodes = books_tree.xpath("//div[@id='product-account-list']/div[contains(@class,'product-line unseen')]")
 
-        # loop through the books
-        for book in book_nodes:
-            # download the book
-            download_book(book, root_directory, formats, includeCode, session, headers)
+            print('###########################################################################')
+            print("FOUND {0} BOOKS: STARTING DOWNLOADS".format(len(book_nodes)))
+            print('###########################################################################')
+
+            # loop through the books
+            for book in book_nodes:
+
+                # download the book
+                books_directory = os.path.join(root_directory, "books")
+                download_book(book, books_directory, book_assets, session, headers)
+
+        if video_assets:
+
+            # get the list of videos
+            videos_page = session.get("https://www.packtpub.com/account/my-videos", verify=True, headers=headers)
+            videos_tree = html.fromstring(videos_page.content)
+            video_nodes = videos_tree.xpath("//div[@id='product-account-list']/div[contains(@class,'product-line unseen')]")
+
+            print('###########################################################################')
+            print("FOUND {0} VIDEOS: STARTING DOWNLOADS".format(len(video_nodes)))
+            print('###########################################################################')
+
+            # loop through the videos
+            for video in video_nodes:
+
+                # download the book
+                videos_directory = os.path.join(root_directory, "videos")
+                download_video(video, videos_directory, video_assets, session, headers)
+
 
 if __name__ == "__main__":
     reload(sys)  
