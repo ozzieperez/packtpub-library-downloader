@@ -37,15 +37,14 @@ def download_to_file(filepath, url, session, headers, prefix_url=True):
             print("Error downloading: " + filepath)
             print(e)
 
-            # get the directory path
-            directory = os.path.dirname(filepath)
+            # if a file was being downloaded, delete it
+            if os.path.exists(filepath):
+                    os.remove(filepath)
 
             # delete directory if it's empty
+            directory = os.path.dirname(filepath)
             if not os.listdir(directory):
                 os.rmdir(directory)
-            # if not empty, remove the current file being downloaded
-            elif os.path.exists(filepath):
-                    os.remove(filepath)
 
             # terminate program
             sys.exit(1)
