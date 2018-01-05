@@ -54,7 +54,7 @@ def download_to_file(filepath, url, session, headers, prefix_url=True):
 
 # creates a json file with info
 def save_book_details(book, title, directory, session, headers):
-    
+
     # fetch the product page
     product_url = book.xpath(".//div[contains(@class,'product-thumbnail')]//a/@href")
     product_page = session.get("https://www.packtpub.com" + product_url[0], verify=True, headers=headers)
@@ -192,6 +192,50 @@ def download_video(video, directory, assets, session, headers):
     if not os.listdir(video_directory):
         os.rmdir(video_directory)
 
+# download course
+def download_course(course, directory, assets, session, headers):
+
+    # scrub the title
+    title = course.xpath("@title")[0].replace("/","-").replace(" [course]","").replace(":", " -").strip()
+
+    # path to save the file
+    course_directory = os.path.join(directory, title)
+
+    # create the directory if doesn't exist
+    if not os.path.exists(course_directory):
+        os.makedirs(course_directory)
+
+    # the title sometimes contains some weird characters that python could not print
+    print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+    print(title.encode(sys.stdout.encoding, errors='replace').decode())
+
+    # get the download links
+    code = course.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/code_download')]/@href")
+    image = course.xpath(".//div[contains(@class,'product-thumbnail')]//img/@src")
+    course = course.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/video_download')]/@href")
+
+    # course
+    if len(course) > 0 and 'course' in assets:
+        filename = os.path.join(course_directory, title + " [course].zip")
+        print("Downloading COURSE")
+        download_to_file(filename, course[0], session, headers)
+
+    # code
+    if len(code) > 0 and 'code' in assets:
+        filename = os.path.join(course_directory, title + " [CODE].zip")
+        print("Downloading CODE")
+        download_to_file(filename, code[0], session, headers)
+
+    # cover image
+    if len(image) > 0 and 'cover' in assets:
+        filename = os.path.join(course_directory, title + ".jpg")
+        image_url = "https:" + image[0].replace("/imagecache/thumbview", "", 1)
+        print("Downloading IMAGE")
+        download_to_file(filename, image_url, session, headers, False)
+
+    # delete directory if it's empty
+    if not os.listdir(course_directory):
+        os.rmdir(course_directory)
 
 def main(argv):
     headers = {
@@ -202,11 +246,12 @@ def main(argv):
     root_directory = 'packtpub_media'
     book_assets = None # 'pdf,mobi,epub,cover,code'
     video_assets = None # 'video,cover,code'
-    errorMessage = 'Usage: downloader.py -e <email> -p <password> [-d <directory> -b <book assets>  -v <video assets>]'
+    course_assets = None # 'course,cover,code'
+    errorMessage = 'Usage: downloader.py -e <email> -p <password> [-d <directory> -b <book assets>  -v <video assets> -c <course assets>]'
 
     # get the command line arguments/options
     try:
-        opts, args = getopt.getopt(argv,"e:p:d:b:v:",["email=","pass=","directory=","books=","videos="])
+        opts, args = getopt.getopt(argv,"e:p:d:b:v:c:",["email=","pass=","directory=","books=","videos=","courses="])
     except getopt.GetoptError:
         print(errorMessage)
         sys.exit(2)
@@ -223,6 +268,9 @@ def main(argv):
             book_assets = arg
         elif opt in ('-v','--videos'):
             video_assets = arg
+        elif opt in ('-c','--courses'):
+            course_assets = arg
+
 
     # do we have the minimum required info?
     if not email or not password:
@@ -301,8 +349,26 @@ def main(argv):
                 videos_directory = os.path.join(root_directory, "videos")
                 download_video(video, videos_directory, video_assets, session, headers)
 
+        if course_assets:
+
+            # get the list of videos
+            courses_page = session.get("https://www.packtpub.com/account/my-courses", verify=True, headers=headers)
+            courses_tree = html.fromstring(courses_page.content)
+            course_nodes = courses_tree.xpath("//div[@id='product-account-list']/div[contains(@class,'product-line unseen')]")
+
+            print('###########################################################################')
+            print("FOUND {0} INTEGRATED COURSES: STARTING DOWNLOADS".format(len(course_nodes)))
+            print('###########################################################################')
+
+            # loop through the videos
+            for course in course_nodes:
+
+                # download the book
+                courses_directory = os.path.join(root_directory, "courses")
+                download_course(course, courses_directory, course_assets, session, headers)
+
 
 if __name__ == "__main__":
-    reload(sys)  
+    reload(sys)
     sys.setdefaultencoding('utf8')
     main(sys.argv[1:])

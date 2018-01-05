@@ -12,8 +12,11 @@ Automatically download all your eBooks and videos. (See: [PacktPub Free Daily Bo
 ##### Example: Download videos, their cover image, and accompanying source code
 	python downloader.py -e hello@world.com -p p@ssw0rd -d ~/Desktop/packt -v video,cover,code
 
+##### Example: Download Integrated Courses (Interactive-Ebooks), their cover image, and accompanying source code
+	python downloader.py -e hello@world.com -p p@ssw0rd -d ~/Desktop/packt -c course,cover,code
+
 ##### Example: Download everything
-	python downloader.py -e hello@world.com -p p@ssw0rd -d ~/Desktop/packt -b pdf,epub,mobi,cover,code,info -v video,cover,code
+	python downloader.py -e hello@world.com -p p@ssw0rd -d ~/Desktop/packt -b pdf,epub,mobi,cover,code,info -v video,cover,code -c course,cover,code
 
 
 ## Commandline Options
@@ -22,6 +25,7 @@ Automatically download all your eBooks and videos. (See: [PacktPub Free Daily Bo
 - *-d*, *--directory* = Directory to download into. Default is "packtpub_media/" in the current directory
 - *-v*, *--videos* = Assets to download. Options are: *video,cover,code*
 - *-b*, *--books* = Assets to download. Options are: *pdf,mobi,epub,cover,code,info*
+- *-c*, *--courses* = Assets to download. Options are: *course,cover,code*
 
 **Video Assets**
 
@@ -37,6 +41,12 @@ Automatically download all your eBooks and videos. (See: [PacktPub Free Daily Bo
 - *cover*: Cover image
 - *code*: Accompanying source code
 - *info*: Creates a JSON file with the title, ISBN, # of pages, and description. (note: it slows downloads)
+
+**Course Assets**
+
+- *course*: The interactive ebook (with integrated videos etc.)
+- *cover*: Cover image
+- *code*: Accompanying source code
 
 
 ## Dependencies:
